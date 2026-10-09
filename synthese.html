@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Mondial Auto 2026 – Synthèse du service</title>
+<style>
+:root{--red:#E2001A;--org:#FF6A13;--dark:#1F1F24;--grey:#5E5E66;--light:#F4F2F0;--line:#E3DEDA;--ok:#1E9E5A}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--dark);background:#fff}
+header{background:linear-gradient(90deg,var(--red),var(--org));color:#fff;padding:16px 24px}
+header h1{margin:0;font-size:22px}header div{opacity:.92;font-size:13px;margin-top:2px}
+main{max-width:1200px;margin:0 auto;padding:16px 24px 40px}
+.panel{border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.panel h2{margin:0 0 8px;font-size:16px}
+.drop{border:2px dashed #bdb8b4;border-radius:12px;padding:22px;text-align:center;background:var(--light);cursor:pointer}
+.drop.over{border-color:var(--red);background:#FFF1EA}
+textarea{width:100%;min-height:60px;border:1px solid var(--line);border-radius:8px;padding:8px;font:12px/1.3 ui-monospace,Consolas,monospace}
+button,.btn{border:0;border-radius:8px;padding:9px 14px;font-size:14px;font-weight:600;background:var(--red);color:#fff;cursor:pointer}
+button.sec{background:var(--light);color:var(--dark);border:1px solid var(--line)}
+.people{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pp{background:var(--light);border:1px solid var(--line);border-radius:16px;padding:4px 6px 4px 12px;font-size:13px;display:flex;gap:6px;align-items:center}
+.pp button{padding:0 7px;background:none;color:var(--grey);border:0;font-size:15px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi div{background:var(--light);border-radius:10px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:26px;color:var(--red)}.kpi span{font-size:12px;color:var(--grey)}
+.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.podium div{border:1px solid var(--line);border-radius:10px;padding:10px;background:#FFF8F4}
+.podium b{display:block}.podium small{color:var(--grey)}
+.ctrl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.ctrl input,.ctrl select{padding:8px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:var(--dark);color:#fff;text-align:left;padding:8px;position:sticky;top:0}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.hall td{background:var(--red);color:#fff;font-weight:700}
+tr.stand td{background:var(--light);font-weight:700}
+.badge{font-size:10px;font-weight:700;color:#fff;border-radius:4px;padding:2px 5px;margin-left:3px}
+.ICE{background:#6B6B73}.HEV{background:#1E9E5A}.PHEV{background:#2A6FDB}.REEV{background:#8A3FD1}
+.st{color:var(--org)}
+.score{font-weight:700;white-space:nowrap}
+.meter{display:inline-block;width:70px;height:8px;background:#E8E4E0;border-radius:4px;vertical-align:middle;margin-right:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--org)}
+.cm{margin:2px 0;font-size:13px}.cm b{color:var(--red)}
+.none{color:#9a9aa2}
+.msg{margin-top:8px;font-size:13px}.msg.err{color:var(--red)}.msg.ok{color:var(--ok)}
+.note{font-size:13px;color:var(--grey)}
+@media(max-width:700px){.kpi,.podium{grid-template-columns:1fr 1fr}main{padding:12px}}
+@media print{.noprint{display:none}header{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<header><h1>MONDIAL AUTO 2026 – Synthèse du service</h1><div>Agrégation des retours de visite (cases vues, notes /5, commentaires)</div></header>
+<main>
+<div class="panel noprint">
+  <h2>1. Charger les retours</h2>
+  <div class="drop" id="drop">Glissez ici les fichiers <b>.json</b> reçus (ou cliquez pour les choisir)<input type="file" id="files" accept=".json,application/json" multiple hidden></div>
+  <div class="note" style="margin-top:8px">Ou collez le texte reçu dans Teams / mail :</div>
+  <textarea id="paste" placeholder='{"app":"mondial2026",…}'></textarea>
+  <div style="margin-top:6px"><button id="addPaste" class="sec">Ajouter le texte collé</button></div>
+  <div class="msg" id="msg"></div>
+  <div class="people" id="people"></div>
+  <div class="note" style="margin-top:8px">Si une même personne renvoie un fichier plus récent, il remplace l'ancien.</div>
+</div>
+
+<div id="result" style="display:none">
+  <div class="panel"><h2>2. Vue d'ensemble</h2>
+    <div class="kpi"><div><b id="kP">0</b><span>participants</span></div><div><b id="kM">0</b><span>modèles vus au moins une fois</span></div><div><b id="kA">–</b><span>note moyenne globale</span></div><div><b id="kC">0</b><span>commentaires</span></div></div>
+    <h2 style="margin-top:14px">Mieux notés</h2><div class="podium" id="podium"></div>
+  </div>
+  <div class="panel"><h2>3. Détail par modèle</h2>
+    <div class="ctrl noprint">
+      <input id="q" placeholder="Rechercher (stand, modèle, commentaire…)">
+      <select id="sort"><option value="route">Ordre du parcours</option><option value="avg">Note moyenne ↓</option><option value="seen">Nb de personnes ayant vu ↓</option><option value="cm">Nb de commentaires ↓</option></select>
+      <button id="xSyn">⬇️ CSV synthèse</button><button id="xDet" class="sec">⬇️ CSV détail (1 ligne / personne)</button><button class="sec" onclick="window.print()">🖨️ Imprimer</button>
+    </div>
+    <table><thead><tr><th>Modèle</th><th>Vu par</th><th>Note moyenne</th><th>Min – Max</th><th>Commentaires</th></tr></thead><tbody id="tb"></tbody></table>
+  </div>
+</div>
+</main>
+
+<script>
+const DATA = [{"no":1,"title":"HALL 5.1","stands":[{"name":"Lynk&Co","star":false,"items":[{"id":"1-lynk-co-07-gt","name":"07 GT","types":["PHEV"],"spec":"1.5T · 408/530 ch · 28,3 kWh · 130-150 km EV · coffre 614 l"}]}]},{"no":2,"title":"HALLS 5.2 / 5.3","stands":[{"name":"Volvo","star":false,"items":[{"id":"2-volvo-xc60-fl","name":"XC60 FL","types":["PHEV","HEV"],"spec":"T6/T8 37,9 kWh · 189-200 km EV · pas de DC (TBC) · vs Rafale"},{"id":"2-volvo-xc40-fl","name":"XC40 FL","types":["ICE"],"spec":"version thermique à chercher (doc : BEV seul détaillé)"}]},{"name":"Mercedes-Benz","star":false,"items":[{"id":"2-mercedes-benz-amg-cle-646","name":"AMG CLE 646","types":["ICE"],"spec":"V8 4.0 biturbo + ISG 48V · 646 ch · série 30 ex."},{"id":"2-mercedes-benz-gla","name":"GLA","types":["ICE"],"spec":"1.5T mHEV 48V (an prochain) · triple écran · vs Austral"}]},{"name":"Hyundai","star":true,"items":[{"id":"2-hyundai-bayon","name":"Bayon","types":["ICE","HEV"],"spec":"2e gén. · dimensions/gabarit · vs Captur"},{"id":"2-hyundai-tucson","name":"Tucson","types":["HEV","PHEV"],"spec":"HEV 233 ch · PHEV 288 ch, 17,1 kWh, 81 km · Europe 2027"}]},{"name":"Zeekr","star":false,"items":[{"id":"2-zeekr-8x-9x","name":"8X / 9X","types":["PHEV"],"spec":"2.0T 650 kW · 70/80 kWh 900V · > 300 km EV · 9X : 4/6/7 pl."}]},{"name":"Denza","star":false,"items":[{"id":"2-denza-bao-5","name":"Bao 5","types":["PHEV"],"spec":"1.5T 400 kW · 31,8 kWh · 90 km · suspension Disus-P · vs Defender"}]}]},{"no":3,"title":"HALL 6 · STAND RENAULT GROUP","stands":[{"name":"Renault Group (à voir en entier)","star":false,"items":[{"id":"3-renault-group-a-voir-en-entier-8-gordini-concept","name":"8 Gordini Concept","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-e-space-concept","name":"E-Space Concept","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-jp4x4-concept","name":"JP4x4 Concept","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-turbo-3e","name":"Turbo 3E","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-megane-e-tech","name":"Megane E-Tech","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-trafic-e-tech","name":"Trafic e-tech","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-renault-pro","name":"Renault Pro+","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-dacia-spring","name":"Dacia Spring","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-dacia-striker","name":"Dacia Striker","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-alpine-a110-sculpture","name":"Alpine A110 Sculpture","types":[],"spec":""},{"id":"3-renault-group-a-voir-en-entier-alpine-ps1","name":"Alpine PS1","types":[],"spec":""}]},{"name":"BYD","star":false,"items":[{"id":"3-byd-dolphin-g","name":"Dolphin G","types":["PHEV","REEV"],"spec":"1.5T 154 kW · 7,4/18,3 kWh · 40/100 km EV · vs Clio"},{"id":"3-byd-world-premiere","name":"World Premiere","types":["PHEV"],"spec":"aucun détail : à identifier"}]},{"name":"Xpeng","star":false,"items":[{"id":"3-xpeng-g9l","name":"G9L","types":["REEV"],"spec":"gén. 1.5T 110 kW · 53/63 kWh · 325-350 km EV · 800V"}]},{"name":"Lotus","star":false,"items":[{"id":"3-lotus-eletre-phev","name":"Eletre PHEV","types":["PHEV"],"spec":"2.0T 205 kW + gén. · 70 kWh 900V · 350 km WLTP"},{"id":"3-lotus-type-135-esprit","name":"Type 135 / Esprit","types":["HEV"],"spec":"V8 HEV Horse · dévoilement possible"}]},{"name":"Kia","star":false,"items":[{"id":"3-kia-niro-fl","name":"Niro FL","types":["HEV"],"spec":"1.6 GDI + 32 kW · 139 ch · 1,3 kWh · vs Symbioz"},{"id":"3-kia-seltos","name":"Seltos","types":["ICE","HEV"],"spec":"1.6T 180/193 ch · HEV 157/180 ch · V2L · vs Duster"}]}]},{"no":4,"title":"HALL 7.1","stands":[{"name":"Geely","star":true,"items":[{"id":"4-geely-starray-em-i","name":"Starray EM-i","types":["PHEV"],"spec":"1.5 + 160 kW · 18,4/29,8 kWh · 83/136 km EV · vs Austral"},{"id":"4-geely-monjaro-em-i","name":"Monjaro EM-i","types":["PHEV"],"spec":"1.5T 275 ch · 28,9 kWh · ≤ 170 km EV · vs Espace"}]},{"name":"Changan / Deepal","star":false,"items":[{"id":"4-changan-deepal-s05-s07","name":"S05 / S07","types":["REEV"],"spec":"1.5 72 kW · 18,4 kWh · 100 km EV · S07 REEV Europe ?"}]},{"name":"Autres stands Renault Group","star":false,"items":[{"id":"4-autres-stands-renault-group-espace-unlimited","name":"Espace Unlimited","types":[],"spec":"présent sur le plan, pas de détail dans le doc"},{"id":"4-autres-stands-renault-group-pompiers","name":"Pompiers","types":[],"spec":"présent sur le plan, pas de détail dans le doc"}]}]},{"no":5,"title":"HALL 4","stands":[{"name":"Audi","star":false,"items":[{"id":"5-audi-a3-fl","name":"A3 FL","types":["ICE","PHEV"],"spec":"1.5 T-GDI 204/272 ch · 25,7 kWh · 126 km EV"},{"id":"5-audi-a6-allroad","name":"A6 Allroad","types":["ICE","PHEV"],"spec":"V6 diesel mHEV · PHEV 362 ch · 25,9 kWh · 95 km"},{"id":"5-audi-q7","name":"Q7","types":["ICE"],"spec":"V6 3.0 TDI mHEV+ 48V · compresseur élec. · HVO"},{"id":"5-audi-q9","name":"Q9","types":["ICE","PHEV"],"spec":"V6/V8 essence, V6 diesel · PHEV « next year »"},{"id":"5-audi-nuvolari","name":"Nuvolari","types":["PHEV"],"spec":"V8 4.8 + 3 mot. axiaux · 1001 ch · série 499 ex."}]},{"name":"Chery","star":true,"items":[{"id":"5-chery-tiggo4","name":"Tiggo4","types":["HEV"],"spec":"204 ch · 1,8 kWh · 23 990 € · vs Duster"},{"id":"5-chery-tiggo7","name":"Tiggo7","types":["HEV","PHEV"],"spec":"HEV 224 ch · PHEV 279 ch, 18,4 kWh · 26 990 € / 32 490 €"},{"id":"5-chery-tiggo8","name":"Tiggo8","types":["PHEV"],"spec":"7 pl. · 279 ch · 90 km EV · 38 990 € · vs Espace"}]},{"name":"Omoda","star":true,"items":[{"id":"5-omoda-omoda-4","name":"Omoda 4","types":["HEV"],"spec":"1.5T 224 ch · DHT · 1,8 kWh · T1X · vs Symbioz"}]},{"name":"Jaecoo","star":true,"items":[{"id":"5-jaecoo-jaecoo-8","name":"Jaecoo 8","types":["PHEV"],"spec":"7 pl. · 605 ch AWD · 34,5 kWh · 145 km EV · ~45 k€"}]},{"name":"Fiat","star":true,"items":[{"id":"5-fiat-grizzly-coupe","name":"Grizzly / Coupé","types":["ICE","HEV"],"spec":"1.2T 100 ch · HEV 136 ch eDCT · dès 25 k€ · vs Bigster"}]},{"name":"Leapmotor","star":false,"items":[{"id":"5-leapmotor-c10-fl","name":"C10 FL","types":["REEV"],"spec":"1.5T gén. · 162 kW · 28,4 kWh · 145 km EV"},{"id":"5-leapmotor-d19","name":"D19","types":["REEV"],"spec":"1.5 95 kW · 63,7-80,3 kWh · 6/7 pl. · version EU ?"}]},{"name":"DS","star":false,"items":[{"id":"5-ds-n7","name":"N°7","types":["HEV"],"spec":"1.2T 145 ch eDCT6 · STLA Medium · vs Rafale"}]},{"name":"Alfa Romeo","star":false,"items":[{"id":"5-alfa-romeo-cuorerosso","name":"Cuorerosso","types":["ICE","PHEV"],"spec":"concept · essence ou PHEV · futur Giulia ?"}]},{"name":"Lancia","star":false,"items":[{"id":"5-lancia-gamma","name":"Gamma","types":["HEV"],"spec":"1.2T 145 ch AT8 · base DS N°7 · vs Austral"}]},{"name":"Peugeot (en passant)","star":false,"items":[{"id":"5-peugeot-en-passant-concepts-n1-n2","name":"Concepts N°1 / N°2","types":[],"spec":"BEV probable, aucun détail"}]}]}];
+const IDX = {}; const ORDER = [];
+DATA.forEach(h=>h.stands.forEach(s=>s.items.forEach(m=>{ IDX[m.id]={hall:h.title,hallNo:h.no,stand:s.name,star:s.star,...m}; ORDER.push(m.id); })));
+const people = {};   // user -> payload
+
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function msg(t,cls){ const m=document.getElementById('msg'); m.textContent=t; m.className='msg '+(cls||''); }
+
+function addPayload(p, src){
+  if(!p || p.app!=='mondial2026' || typeof p.items!=='object') throw new Error('format non reconnu');
+  const user=String(p.user||src||'Anonyme').trim()||'Anonyme';
+  const old=people[user];
+  if(old && String(old.exportedAt||'')>String(p.exportedAt||'')) return user+' (déjà chargé, version plus récente conservée)';
+  people[user]=p; return user+(old?' (mis à jour)':'');
+}
+async function readFiles(fl){
+  const ok=[],ko=[];
+  for(const f of fl){ try{ ok.push(addPayload(JSON.parse(await f.text()), f.name.replace(/\.json$/i,''))); }catch(e){ ko.push(f.name+' : '+e.message); } }
+  msg((ok.length?ok.length+' fichier(s) pris en compte. ':'')+(ko.length?'Ignoré : '+ko.join(' ; '):''), ko.length?'err':'ok'); render();
+}
+const drop=document.getElementById('drop'), fi=document.getElementById('files');
+drop.onclick=()=>fi.click(); fi.onchange=()=>{ readFiles([...fi.files]); fi.value=''; };
+['dragover','dragenter'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.add('over');}));
+['dragleave','drop'].forEach(e=>drop.addEventListener(e,ev=>{ev.preventDefault();drop.classList.remove('over');}));
+drop.addEventListener('drop',ev=>readFiles([...ev.dataTransfer.files]));
+document.getElementById('addPaste').onclick=()=>{
+  const t=document.getElementById('paste').value.trim(); if(!t) return;
+  try{ const u=addPayload(JSON.parse(t)); msg('Pris en compte : '+u,'ok'); document.getElementById('paste').value=''; render(); }catch(e){ msg('Texte non reconnu : '+e.message,'err'); }
+};
+
+function stats(){
+  const users=Object.keys(people), st={};
+  ORDER.forEach(id=>st[id]={seen:0,ratings:[],cms:[]});
+  users.forEach(u=>{ const it=people[u].items; for(const id in it){ if(!st[id]) continue; const v=it[id]; const r=Number(v.rating)||0, c=String(v.comment||'').trim();
+    if(v.seen||r||c) st[id].seen++; if(r>=1&&r<=5) st[id].ratings.push(r); if(c) st[id].cms.push({u,c,r}); }});
+  ORDER.forEach(id=>{ const a=st[id].ratings; st[id].avg=a.length?a.reduce((x,y)=>x+y,0)/a.length:null; });
+  return {users,st};
+}
+function stars(a){ return a==null?'<span class="none">–</span>':'<span class="meter"><i style="width:'+(a*20)+'%"></i></span>'+a.toFixed(1).replace('.',',')+' / 5'; }
+
+function render(){
+  const {users,st}=stats();
+  document.getElementById('people').innerHTML=users.map(u=>{ const n=Object.values(people[u].items).filter(v=>v.seen||v.rating||v.comment).length;
+    return '<span class="pp">'+esc(u)+' · '+n+' modèles<button title="Retirer" data-u="'+esc(u)+'">✕</button></span>'; }).join('');
+  document.querySelectorAll('.pp button').forEach(b=>b.onclick=()=>{ delete people[b.dataset.u]; render(); });
+  document.getElementById('result').style.display=users.length?'block':'none'; if(!users.length) return;
+
+  const all=ORDER.flatMap(id=>st[id].ratings), seenIds=ORDER.filter(id=>st[id].seen>0), nC=ORDER.reduce((a,id)=>a+st[id].cms.length,0);
+  document.getElementById('kP').textContent=users.length; document.getElementById('kM').textContent=seenIds.length+' / '+ORDER.length;
+  document.getElementById('kA').textContent=all.length?(all.reduce((a,b)=>a+b,0)/all.length).toFixed(1).replace('.',','):'–'; document.getElementById('kC').textContent=nC;
+  const top=ORDER.filter(id=>st[id].avg!=null).sort((a,b)=>st[b].avg-st[a].avg||st[b].ratings.length-st[a].ratings.length).slice(0,3);
+  document.getElementById('podium').innerHTML=top.length?top.map((id,i)=>'<div><small>#'+(i+1)+' · '+esc(IDX[id].stand)+'</small><b>'+esc(IDX[id].name)+'</b>'+stars(st[id].avg)+'<br><small>'+st[id].ratings.length+' note(s)</small></div>').join(''):'<div class="none">Aucune note pour l\'instant</div>';
+
+  const q=document.getElementById('q').value.trim().toLowerCase(), sort=document.getElementById('sort').value;
+  let ids=ORDER.slice();
+  if(q) ids=ids.filter(id=>(IDX[id].stand+' '+IDX[id].name+' '+st[id].cms.map(c=>c.c).join(' ')).toLowerCase().includes(q));
+  if(sort==='avg') ids.sort((a,b)=>(st[b].avg??-1)-(st[a].avg??-1)); else if(sort==='seen') ids.sort((a,b)=>st[b].seen-st[a].seen); else if(sort==='cm') ids.sort((a,b)=>st[b].cms.length-st[a].cms.length);
+  let html='', lastH=null, lastS=null; const grouped=sort==='route';
+  ids.forEach(id=>{ const m=IDX[id], s=st[id];
+    if(grouped){ if(m.hall!==lastH){ html+='<tr class="hall"><td colspan="5">'+esc(m.hall)+'</td></tr>'; lastH=m.hall; lastS=null; } if(m.stand!==lastS){ html+='<tr class="stand"><td colspan="5">'+(m.star?'<span class="st">★ </span>':'')+esc(m.stand)+'</td></tr>'; lastS=m.stand; } }
+    const mm=s.ratings.length?Math.min(...s.ratings)+' – '+Math.max(...s.ratings):'–';
+    html+='<tr><td><b>'+esc(m.name)+'</b>'+m.types.map(t=>'<span class="badge '+t+'">'+t+'</span>').join('')+(grouped?'':'<br><small class="note">'+esc(m.stand)+'</small>')+'</td><td>'+s.seen+' / '+users.length+'</td><td class="score">'+stars(s.avg)+'<br><small class="note">'+s.ratings.length+' note(s)</small></td><td>'+mm+'</td><td>'+(s.cms.length?s.cms.map(c=>'<div class="cm"><b>'+esc(c.u)+'</b>'+(c.r?' ('+c.r+'/5)':'')+' : '+esc(c.c)+'</div>').join(''):'<span class="none">–</span>')+'</td></tr>'; });
+  document.getElementById('tb').innerHTML=html||'<tr><td colspan="5" class="none">Aucun résultat</td></tr>';
+}
+document.getElementById('q').oninput=render; document.getElementById('sort').onchange=render;
+
+function dl(name,text){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'text/csv'})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); }
+const q_=s=>'"'+String(s).replace(/"/g,'""')+'"';
+document.getElementById('xSyn').onclick=()=>{ const {users,st}=stats(); const rows=[['Hall','Stand','Modèle','Nb vu','Nb participants','Nb notes','Note moyenne','Min','Max','Commentaires'].map(q_).join(';')];
+  ORDER.forEach(id=>{ const m=IDX[id],s=st[id]; rows.push([m.hall,m.stand,m.name,s.seen,users.length,s.ratings.length,s.avg==null?'':s.avg.toFixed(2).replace('.',','),s.ratings.length?Math.min(...s.ratings):'',s.ratings.length?Math.max(...s.ratings):'',s.cms.map(c=>c.u+(c.r?' ('+c.r+'/5)':'')+' : '+c.c).join(' | ')].map(q_).join(';')); });
+  dl('mondial2026_synthese_service.csv','\ufeff'+rows.join('\r\n')); };
+document.getElementById('xDet').onclick=()=>{ const rows=[['Participant','Hall','Stand','Modèle','Vu','Note','Commentaire'].map(q_).join(';')];
+  Object.keys(people).forEach(u=>{ const it=people[u].items; ORDER.forEach(id=>{ const v=it[id]; if(!v) return; const m=IDX[id]; rows.push([u,m.hall,m.stand,m.name,v.seen||v.rating||v.comment?'oui':'non',v.rating||'',v.comment||''].map(q_).join(';')); }); });
+  dl('mondial2026_detail_par_personne.csv','\ufeff'+rows.join('\r\n')); };
+</script>
+</body>
+</html>
